@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AisleClear - Find allergen-free food</title>
+  <meta name="description" content="Search for packaged foods and local stores that match your allergen restrictions." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f9f8;
+      --surface: #ffffff;
+      --border: #e4e4e0;
+      --border-strong: #c8c8c4;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b66;
+      --text-muted: #9b9b96;
+      --green-bg: #eaf3de;
+      --green-text: #3b6d11;
+      --green-border: #c0dd97;
+      --yellow-bg: #faeeda;
+      --yellow-text: #854f0b;
+      --yellow-border: #fac775;
+      --red-bg: #fcebeb;
+      --red-text: #a32d2d;
+      --red-border: #f7c1c1;
+      --accent: #185fa5;
+      --accent-bg: #e6f1fb;
+      --accent-border: #b5d4f4;
+      --radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a18;
+        --surface: #242422;
+        --border: #333330;
+        --border-strong: #4a4a46;
+        --text-primary: #f0f0ec;
+        --text-secondary: #a0a09a;
+        --text-muted: #6a6a66;
+        --green-bg: #173404;
+        --green-text: #c0dd97;
+        --green-border: #3b6d11;
+        --yellow-bg: #412402;
+        --yellow-text: #fac775;
+        --yellow-border: #854f0b;
+        --red-bg: #501313;
+        --red-text: #f09595;
+        --red-border: #a32d2d;
+        --accent: #85b7eb;
+        --accent-bg: #042c53;
+        --accent-border: #185fa5;
+      }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 10px;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .preset-btn {
+      height: 52px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: inherit;
+      transition: background 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .preset-btn:active { background: var(--bg); }
+
+    .preset-btn.on {
+      background: var(--red-bg);
+      border-color: var(--red-border);
+      color: var(--red-text);
+    }
+
+    .custom-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input, button {
+      font-family: inherit;
+      font-size: 15px;
+    }
+
+    .custom-row input {
+      flex: 1;
+      height: 48px;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+
+    .custom-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    .add-btn {
+      height: 48px;
+      padding: 0 18px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .add-btn:active { background: var(--bg); }
+
+    .tag-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 10px;
+      margin-bottom: 4px;
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--red-bg);
+      border: 0.5px solid var(--red-border);
+      color: var(--red-text);
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+
+    .tag button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--red-text);
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .divider {
+      height: 0.5px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    .field {
+      height: 52px;
+      width: 100%;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+
+    .location-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: -8px;
+      margin-bottom: 16px;
+    }
+
+    .search-btn {
+      width: 100%;
+      height: 52px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--text-primary);
+      color: var(--bg);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.1s;
+    }
+
+    .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .search-btn:active:not(:disabled) { opacity: 0.85; }
+
+    .status {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 14px 0 6px;
+      min-height: 18px;
+    }
+
+    .results-heading {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card-header:active { background: var(--bg); }
+
+    .badge {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-safe {
+      background: var(--green-bg);
+      color: var(--green-text);
+      border: 0.5px solid var(--green-border);
+    }
+
+    .badge-verify {
+      background: var(--yellow-bg);
+      color: var(--yellow-text);
+      border: 0.5px solid var(--yellow-border);
+    }
+
+    .card-info { flex: 1; min-width: 0; }
+
+    .card-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-brand {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .chevron {
+      color: var(--text-muted);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .chevron.open { transform: rotate(180deg); }
+
+    .card-body {
+      padding: 0 14px 14px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .ing-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 12px 0 6px;
+    }
+
+    .ing-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .caution-note {
+      font-size: 12px;
+      color: var(--yellow-text);
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: var(--yellow-bg);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--yellow-border);
+      line-height: 1.5;
+    }
+
+    .find-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 7px 14px;
+      border: 0.5px solid var(--accent-border);
+      border-radius: var(--radius);
+      background: var(--accent-bg);
+    }
+
+    .local-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 8px;
+    }
+
+    .local-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .local-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    .disclaimer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      padding: 12px 14px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .error-box {
+      font-size: 13px;
+      color: var(--red-text);
+      padding: 12px 14px;
+      background: var(--red-bg);
+      border: 0.5px solid var(--red-border);
+      border-radius: var(--radius);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <h1>AisleClear</h1>
+  <p>Find packaged foods that match your restrictions</p>
+</header>
+
+<main class="main">
+
+  <div class="section-label">Ingredients to avoid</div>
+  <div class="preset-grid" id="presetGrid"></div>
+
+  <div class="custom-row">
+    <input id="customInput" type="text" placeholder="Add another ingredient..." autocomplete="off" autocorrect="off" autocapitalize="none" />
+    <button class="add-btn" onclick="addCustom()">Add</button>
+  </div>
+  <div class="tag-strip" id="tagStrip"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">What are you looking for?</div>
+  <input class="field" id="productInput" type="text" placeholder="e.g. bread, crackers, pasta..." autocorrect="off" />
+
+  <div class="section-label" style="margin-top:4px">Your city or zip code <span style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></div>
+  <input class="field" id="locationInput" type="text" placeholder="e.g. Dallas TX or 75201" autocorrect="off" />
+  <p class="location-hint">Leave blank to search US packaged products only</p>
+
+  <button class="search-btn" id="searchBtn" onclick="doSearch()">
+    <span id="btnIcon">&#128269;</span>
+    <span id="btnText">Find safe products</span>
+  </button>
+
+  <div class="status" id="status"></div>
+  <div id="resultsArea"></div>
+
+</main>
+
+<script>
+const PRESETS = [
+  { id: 'gluten', label: 'Gluten' },
+  { id: 'dairy', label: 'Dairy' },
+  { id: 'eggs', label: 'Eggs' },
+  { id: 'banana', label: 'Banana' },
+  { id: 'soy', label: 'Soy' },
+  { id: 'peanuts', label: 'Peanuts' },
+  { id: 'tree nuts', label: 'Tree nuts' },
+  { id: 'sesame', label: 'Sesame' },
+];
+
+let active = new Set(['gluten', 'dairy', 'eggs', 'banana']);
+let customTags = [];
+let expanded = new Set();
+
+function renderPresets() {
+  const grid = document.getElementById('presetGrid');
+  grid.innerHTML = '';
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (active.has(p.id) ? ' on' : '');
+    btn.textContent = (active.has(p.id) ? '+ ' : '+ ') + p.label;
+    btn.innerHTML = active.has(p.id)
+      ? `<span style="font-size:16px">&#10003;</span> ${p.label}`
+      : `<span style="font-size:16px">+</span> ${p.label}`;
+    btn.onclick = () => {
+      active.has(p.id) ? active.delete(p.id) : active.add(p.id);
+      renderPresets();
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function renderTagStrip() {
+  const strip = document.getElementById('tagStrip');
+  strip.innerHTML = '';
+  customTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag';
+    chip.innerHTML = `${t}<button onclick="removeCustom(${i})" aria-label="Remove ${t}">&times;</button>`;
+    strip.appendChild(chip);
+  });
+}
+
+function addCustom() {
+  const inp = document.getElementById('customInput');
+  const v = inp.value.trim().replace(/,$/, '').trim();
+  if (!v) return;
+  if (!customTags.map(t => t.toLowerCase()).includes(v.toLowerCase()) && !PRESETS.find(p => p.id === v.toLowerCase())) {
+    customTags.push(v);
+    renderTagStrip();
+  }
+  inp.value = '';
+  inp.focus();
+}
+
+function removeCustom(i) { customTags.splice(i, 1); renderTagStrip(); }
+
+document.getElementById('customInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addCustom(); }
+});
+
+function getAllergens() {
+  const list = PRESETS.filter(p => active.has(p.id)).map(p => p.label);
+  customTags.forEach(t => list.push(t));
+  return list;
+}
+
+function toggleCard(i) {
+  expanded.has(i) ? expanded.delete(i) : expanded.add(i);
+  renderResults(window._lastData);
+}
+
+function googleLink(name, brand) {
+  return 'https://www.google.com/search?q=' + encodeURIComponent((brand ? brand + ' ' : '') + name + ' buy online US');
+}
+
+function mapsLink(name, location) {
+  const q = location ? name + ' near ' + location : name + ' near me';
+  return 'https://www.google.com/maps/search/' + encodeURIComponent(q);
+}
+
+function renderResults(data) {
+  window._lastData = data;
+  const area = document.getElementById('resultsArea');
+  if (!data) { area.innerHTML = ''; return; }
+
+  let html = '';
+
+  if (data.packaged && data.packaged.length) {
+    html += `<div class="results-heading">&#128230; Packaged products</div>`;
+    data.packaged.forEach((p, i) => {
+      const isOpen = expanded.has(i);
+      const badge = p.caution
+        ? `<span class="badge badge-verify">Verify</span>`
+        : `<span class="badge badge-safe">Safe</span>`;
+      html += `<div class="card">
+        <div class="card-header" onclick="toggleCard(${i})">
+          ${badge}
+          <div class="card-info">
+            <div class="card-name">${p.name}</div>
+            ${p.brand ? `<div class="card-brand">${p.brand}</div>` : ''}
+          </div>
+          <span class="chevron ${isOpen ? 'open' : ''}">&#8964;</span>
+        </div>
+        ${isOpen ? `<div class="card-body">
+          <div class="ing-label">Ingredients</div>
+          <div class="ing-text">${p.ingredients || 'Not available. Always check the physical package before consuming.'}</div>
+          ${p.caution ? `<div class="caution-note">&#9888; ${p.caution}</div>` : ''}
+          <a class="find-link" href="${googleLink(p.name, p.brand)}" target="_blank" rel="noopener">
+            &#128269; Find this product
+          </a>
+        </div>` : ''}
+      </div>`;
+    });
+  }
+
+  if (data.local && data.local.length) {
+    html += `<div class="results-heading">&#128205; Local options near ${data.location}</div>`;
+    data.local.forEach(l => {
+      html += `<div class="local-card">
+        <div class="local-name">${l.name}</div>
+        <div class="local-desc">${l.description}</div>
+        ${l.caution ? `<div class="caution-note" style="margin-top:8px">&#9888; ${l.caution}</div>` : ''}
+        <a class="find-link" href="${mapsLink(l.name, data.location)}" target="_blank" rel="noopener" style="margin-top:10px">
+          &#128205; Find on Google Maps
+        </a>
+      </div>`;
+    });
+  }
+
+  if (!data.packaged?.length && !data.local?.length) {
+    html = `<div style="text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:14px">No results found. Try broadening your search or adjusting your allergen filters.</div>`;
+  }
+
+  html += `<div class="disclaimer">Ingredient information is AI-generated based on known formulations and may not reflect recent changes. Always read the physical package label before consuming, especially for serious allergies. Formulas change without notice.</div>`;
+
+  area.innerHTML = html;
+}
+
+async function doSearch() {
+  const product = document.getElementById('productInput').value.trim();
+  const location = document.getElementById('locationInput').value.trim();
+  const allergens = getAllergens();
+
+  if (!product) { document.getElementById('status').textContent = 'Enter a food product to search for.'; return; }
+  if (!allergens.length) { document.getElementById('status').textContent = 'Select at least one ingredient to avoid.'; return; }
+
+  const btn = document.getElementById('searchBtn');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  document.getElementById('btnIcon').outerHTML = '<span class="spinner" id="btnIcon"></span>';
+  document.getElementById('btnText').textContent = 'Searching...';
+  status.textContent = 'Finding safe products...';
+  document.getElementById('resultsArea').innerHTML = '';
+  expanded.clear();
+
+  try {
+    const resp = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product, allergens, location }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error || `Server error ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    status.textContent = `Found ${data.packaged?.length || 0} packaged products${data.local?.length ? ' and ' + data.local.length + ' local options' : ''}.`;
+    renderResults(data);
+
+  } catch (e) {
+    status.textContent = '';
+    document.getElementById('resultsArea').innerHTML = `<div class="error-box">Search failed: ${e.message}. Please try again.</div>`;
+  }
+
+  btn.disabled = false;
+  document.querySelector('.spinner')?.remove();
+  btn.innerHTML = '<span id="btnIcon">&#128269;</span> <span id="btnText">Find safe products</span>';
+}
+
+document.getElementById('productInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+renderPresets();
+renderTagStrip();
+</script>
+
+</body>
+</html>
