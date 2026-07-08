@@ -1,11 +1,5 @@
 {
   "name": "aisle-clear",
   "version": "1.0.0",
-  "description": "Find allergen-free packaged foods and local stores",
-  "scripts": {
-    "dev": "vercel dev"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+  "description": "Find allergen-free packaged foods using real ingredient data from Open Food Facts"
 }

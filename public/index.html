@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AisleClear - Find allergen-free food</title>
-  <meta name="description" content="Search for packaged foods and local stores that match your allergen restrictions." />
+  <meta name="description" content="Search packaged foods by allergen restrictions. Real ingredient data, no guessing." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f9f9f8;
+      --bg: #f7f7f5;
       --surface: #ffffff;
       --border: #e4e4e0;
       --border-strong: #c8c8c4;
@@ -25,10 +25,14 @@
       --red-bg: #fcebeb;
       --red-text: #a32d2d;
       --red-border: #f7c1c1;
+      --gray-bg: #f0f0ee;
+      --gray-text: #6b6b66;
+      --gray-border: #c8c8c4;
       --accent: #185fa5;
       --accent-bg: #e6f1fb;
       --accent-border: #b5d4f4;
       --radius: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -46,9 +50,12 @@
         --yellow-bg: #412402;
         --yellow-text: #fac775;
         --yellow-border: #854f0b;
-        --red-bg: #501313;
+        --red-bg: #3b1010;
         --red-text: #f09595;
         --red-border: #a32d2d;
+        --gray-bg: #2a2a28;
+        --gray-text: #a0a09a;
+        --gray-border: #4a4a46;
         --accent: #85b7eb;
         --accent-bg: #042c53;
         --accent-border: #185fa5;
@@ -58,36 +65,26 @@
     body {
       background: var(--bg);
       color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--font);
       min-height: 100vh;
     }
 
     .header {
       background: var(--surface);
       border-bottom: 0.5px solid var(--border);
-      padding: 16px 20px;
+      padding: 14px 20px;
       position: sticky;
       top: 0;
       z-index: 10;
     }
 
-    .header h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: -0.3px;
-    }
-
-    .header p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
+    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .header p { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
 
     .main {
       max-width: 520px;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 18px 16px 60px;
     }
 
     .section-label {
@@ -96,60 +93,54 @@
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: .07em;
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
 
     .preset-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .preset-btn {
-      height: 52px;
+      height: 50px;
       border-radius: var(--radius);
       border: 0.5px solid var(--border-strong);
       background: var(--surface);
       color: var(--text-primary);
       font-size: 15px;
+      font-family: var(--font);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 7px;
-      font-family: inherit;
       transition: background 0.1s;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .preset-btn:active { background: var(--bg); }
+    .preset-btn:active { opacity: 0.8; }
 
     .preset-btn.on {
       background: var(--red-bg);
       border-color: var(--red-border);
       color: var(--red-text);
+      font-weight: 500;
     }
 
-    .custom-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    input, button {
-      font-family: inherit;
-      font-size: 15px;
-    }
+    .custom-row { display: flex; gap: 8px; margin-bottom: 10px; }
 
     .custom-row input {
       flex: 1;
-      height: 48px;
+      height: 46px;
       padding: 0 14px;
       border-radius: var(--radius);
       border: 0.5px solid var(--border-strong);
       background: var(--surface);
       color: var(--text-primary);
+      font-size: 15px;
+      font-family: var(--font);
     }
 
     .custom-row input:focus {
@@ -159,30 +150,32 @@
     }
 
     .add-btn {
-      height: 48px;
-      padding: 0 18px;
+      height: 46px;
+      padding: 0 16px;
       border-radius: var(--radius);
       border: 0.5px solid var(--border-strong);
       background: var(--surface);
       color: var(--text-primary);
+      font-size: 14px;
+      font-family: var(--font);
       cursor: pointer;
       white-space: nowrap;
     }
 
-    .add-btn:active { background: var(--bg); }
+    .add-btn:active { opacity: 0.8; }
 
     .tag-strip {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: 6px;
       min-height: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .tag {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       background: var(--red-bg);
       border: 0.5px solid var(--red-border);
       color: var(--red-text);
@@ -196,21 +189,17 @@
       border: none;
       cursor: pointer;
       color: var(--red-text);
-      font-size: 16px;
+      font-size: 17px;
       line-height: 1;
       padding: 0;
       display: flex;
       align-items: center;
     }
 
-    .divider {
-      height: 0.5px;
-      background: var(--border);
-      margin: 20px 0;
-    }
+    .divider { height: 0.5px; background: var(--border); margin: 18px 0; }
 
     .field {
-      height: 52px;
+      height: 50px;
       width: 100%;
       padding: 0 14px;
       border-radius: var(--radius);
@@ -218,6 +207,7 @@
       background: var(--surface);
       color: var(--text-primary);
       font-size: 15px;
+      font-family: var(--font);
       margin-bottom: 12px;
     }
 
@@ -230,8 +220,8 @@
     .location-hint {
       font-size: 12px;
       color: var(--text-muted);
-      margin-top: -8px;
-      margin-bottom: 16px;
+      margin: -8px 0 16px;
+      line-height: 1.5;
     }
 
     .search-btn {
@@ -242,35 +232,33 @@
       background: var(--text-primary);
       color: var(--bg);
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
+      font-family: var(--font);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: opacity 0.1s;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .search-btn:active:not(:disabled) { opacity: 0.85; }
+    .search-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .search-btn:active:not(:disabled) { opacity: 0.8; }
 
     .status {
       font-size: 13px;
       color: var(--text-secondary);
-      margin: 14px 0 6px;
+      margin: 14px 0 4px;
       min-height: 18px;
     }
 
     .results-heading {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: .07em;
-      margin: 20px 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin: 18px 0 10px;
     }
 
     .card {
@@ -285,32 +273,26 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 14px;
+      padding: 13px 14px;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
 
     .card-header:active { background: var(--bg); }
 
-    .badge {
+    .score-pill {
       flex-shrink: 0;
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
+      white-space: nowrap;
     }
 
-    .badge-safe {
-      background: var(--green-bg);
-      color: var(--green-text);
-      border: 0.5px solid var(--green-border);
-    }
-
-    .badge-verify {
-      background: var(--yellow-bg);
-      color: var(--yellow-text);
-      border: 0.5px solid var(--yellow-border);
-    }
+    .pill-clear { background: var(--green-bg); color: var(--green-text); border: 0.5px solid var(--green-border); }
+    .pill-warn  { background: var(--yellow-bg); color: var(--yellow-text); border: 0.5px solid var(--yellow-border); }
+    .pill-bad   { background: var(--red-bg); color: var(--red-text); border: 0.5px solid var(--red-border); }
+    .pill-unk   { background: var(--gray-bg); color: var(--gray-text); border: 0.5px solid var(--gray-border); }
 
     .card-info { flex: 1; min-width: 0; }
 
@@ -323,17 +305,25 @@
       text-overflow: ellipsis;
     }
 
-    .card-brand {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
+    .card-brand { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .card-hits { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+
+    .hit-flag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: var(--red-bg);
+      color: var(--red-text);
+      border: 0.5px solid var(--red-border);
     }
 
     .chevron {
       color: var(--text-muted);
-      font-size: 18px;
+      font-size: 20px;
       flex-shrink: 0;
       transition: transform 0.2s;
+      line-height: 1;
     }
 
     .chevron.open { transform: rotate(180deg); }
@@ -348,24 +338,27 @@
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: .05em;
-      margin: 12px 0 6px;
+      margin: 11px 0 6px;
     }
 
     .ing-text {
       font-size: 13px;
       color: var(--text-secondary);
-      line-height: 1.8;
+      line-height: 1.9;
     }
 
-    .caution-note {
-      font-size: 12px;
-      color: var(--yellow-text);
-      margin-top: 10px;
-      padding: 8px 10px;
-      background: var(--yellow-bg);
-      border-radius: var(--radius);
-      border: 0.5px solid var(--yellow-border);
-      line-height: 1.5;
+    .ing-hit {
+      color: var(--red-text);
+      font-weight: 600;
+      background: var(--red-bg);
+      border-radius: 3px;
+      padding: 0 3px;
+    }
+
+    .updated-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
     }
 
     .find-link {
@@ -380,28 +373,43 @@
       border: 0.5px solid var(--accent-border);
       border-radius: var(--radius);
       background: var(--accent-bg);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .local-card {
+    .local-section { margin-top: 6px; }
+
+    .local-link-card {
       background: var(--surface);
       border: 0.5px solid var(--border);
       border-radius: 12px;
-      padding: 14px;
+      padding: 13px 14px;
       margin-bottom: 8px;
-    }
-
-    .local-name {
-      font-size: 14px;
-      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
       color: var(--text-primary);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .local-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      line-height: 1.6;
+    .local-link-card:active { background: var(--bg); }
+
+    .local-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
     }
+
+    .local-text { flex: 1; min-width: 0; }
+    .local-title { font-size: 14px; font-weight: 500; }
+    .local-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+
+    .local-arrow { color: var(--text-muted); font-size: 18px; }
 
     .disclaimer {
       margin-top: 20px;
@@ -414,6 +422,8 @@
       background: var(--surface);
     }
 
+    .disclaimer strong { color: var(--text-secondary); }
+
     .error-box {
       font-size: 13px;
       color: var(--red-text);
@@ -425,10 +435,18 @@
       line-height: 1.6;
     }
 
+    .empty {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
     .spinner {
       width: 18px;
       height: 18px;
-      border: 2px solid currentColor;
+      border: 2.5px solid currentColor;
       border-top-color: transparent;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -442,7 +460,7 @@
 
 <header class="header">
   <h1>AisleClear</h1>
-  <p>Find packaged foods that match your restrictions</p>
+  <p>Real ingredient data from Open Food Facts</p>
 </header>
 
 <main class="main">
@@ -451,7 +469,8 @@
   <div class="preset-grid" id="presetGrid"></div>
 
   <div class="custom-row">
-    <input id="customInput" type="text" placeholder="Add another ingredient..." autocomplete="off" autocorrect="off" autocapitalize="none" />
+    <input id="customInput" type="text" placeholder="Add another ingredient..."
+      autocomplete="off" autocorrect="off" autocapitalize="none" />
     <button class="add-btn" onclick="addCustom()">Add</button>
   </div>
   <div class="tag-strip" id="tagStrip"></div>
@@ -459,15 +478,19 @@
   <div class="divider"></div>
 
   <div class="section-label">What are you looking for?</div>
-  <input class="field" id="productInput" type="text" placeholder="e.g. bread, crackers, pasta..." autocorrect="off" />
+  <input class="field" id="productInput" type="text"
+    placeholder="e.g. bread, crackers, pasta..." autocorrect="off" />
 
-  <div class="section-label" style="margin-top:4px">Your city or zip code <span style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></div>
-  <input class="field" id="locationInput" type="text" placeholder="e.g. Dallas TX or 75201" autocorrect="off" />
-  <p class="location-hint">Leave blank to search US packaged products only</p>
+  <div class="section-label" style="margin-top:2px">
+    Your city or zip code
+    <span style="font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span>
+  </div>
+  <input class="field" id="locationInput" type="text"
+    placeholder="e.g. Dallas TX or 75201" autocorrect="off" />
+  <p class="location-hint">Used to build local store search links. Not stored.</p>
 
   <button class="search-btn" id="searchBtn" onclick="doSearch()">
-    <span id="btnIcon">&#128269;</span>
-    <span id="btnText">Find safe products</span>
+    <span id="btnContent">&#128269; Find safe products</span>
   </button>
 
   <div class="status" id="status"></div>
@@ -477,17 +500,17 @@
 
 <script>
 const PRESETS = [
-  { id: 'gluten', label: 'Gluten' },
-  { id: 'dairy', label: 'Dairy' },
-  { id: 'eggs', label: 'Eggs' },
-  { id: 'banana', label: 'Banana' },
-  { id: 'soy', label: 'Soy' },
-  { id: 'peanuts', label: 'Peanuts' },
-  { id: 'tree nuts', label: 'Tree nuts' },
-  { id: 'sesame', label: 'Sesame' },
+  { id:'gluten',    label:'Gluten',     terms:['wheat','barley','rye','malt','spelt','semolina','triticale','gluten','kamut','einkorn','emmer','farro','durum','wheat starch','wheat flour'] },
+  { id:'dairy',     label:'Dairy',      terms:['milk','cream','butter','cheese','whey','casein','lactose','ghee','lactalbumin','lactoglobulin','caseinate','dairy','yogurt','kefir','buttermilk','curds','skim milk','whole milk','nonfat milk','dried milk'] },
+  { id:'eggs',      label:'Eggs',       terms:['egg','albumin','mayonnaise','meringue','ovalbumin','ovomucin','ovomucoid','lysozyme','dried egg','egg white','egg yolk','whole egg'] },
+  { id:'banana',    label:'Banana',     terms:['banana'] },
+  { id:'soy',       label:'Soy',        terms:['soy','soya','tofu','edamame','miso','tempeh','tvp','textured vegetable protein','soybean','soy flour','soy protein'] },
+  { id:'peanuts',   label:'Peanuts',    terms:['peanut','groundnut','arachis','peanut butter','peanut oil'] },
+  { id:'tree nuts', label:'Tree nuts',  terms:['almond','cashew','walnut','pecan','pistachio','hazelnut','brazil nut','macadamia','pine nut','chestnut','coconut'] },
+  { id:'sesame',    label:'Sesame',     terms:['sesame','tahini','til','gingelly','benne','sesame oil','sesame seed'] },
 ];
 
-let active = new Set(['gluten', 'dairy', 'eggs', 'banana']);
+let active = new Set(['gluten','dairy','eggs','banana']);
 let customTags = [];
 let expanded = new Set();
 
@@ -497,14 +520,10 @@ function renderPresets() {
   PRESETS.forEach(p => {
     const btn = document.createElement('button');
     btn.className = 'preset-btn' + (active.has(p.id) ? ' on' : '');
-    btn.textContent = (active.has(p.id) ? '+ ' : '+ ') + p.label;
     btn.innerHTML = active.has(p.id)
-      ? `<span style="font-size:16px">&#10003;</span> ${p.label}`
-      : `<span style="font-size:16px">+</span> ${p.label}`;
-    btn.onclick = () => {
-      active.has(p.id) ? active.delete(p.id) : active.add(p.id);
-      renderPresets();
-    };
+      ? `<span style="font-size:15px">&#10003;</span> ${p.label}`
+      : `<span style="font-size:15px">+</span> ${p.label}`;
+    btn.onclick = () => { active.has(p.id) ? active.delete(p.id) : active.add(p.id); renderPresets(); };
     grid.appendChild(btn);
   });
 }
@@ -524,7 +543,8 @@ function addCustom() {
   const inp = document.getElementById('customInput');
   const v = inp.value.trim().replace(/,$/, '').trim();
   if (!v) return;
-  if (!customTags.map(t => t.toLowerCase()).includes(v.toLowerCase()) && !PRESETS.find(p => p.id === v.toLowerCase())) {
+  if (!customTags.map(t => t.toLowerCase()).includes(v.toLowerCase()) &&
+      !PRESETS.find(p => p.id === v.toLowerCase())) {
     customTags.push(v);
     renderTagStrip();
   }
@@ -538,88 +558,153 @@ document.getElementById('customInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addCustom(); }
 });
 
-function getAllergens() {
-  const list = PRESETS.filter(p => active.has(p.id)).map(p => p.label);
-  customTags.forEach(t => list.push(t));
-  return list;
+function getAllMatchers() {
+  const matchers = PRESETS.filter(p => active.has(p.id)).map(p => ({ label: p.label, terms: p.terms }));
+  customTags.forEach(t => matchers.push({ label: t, terms: [t.toLowerCase()] }));
+  return matchers;
+}
+
+function detectHits(text, matchers) {
+  const lower = text.toLowerCase();
+  return matchers
+    .filter(m => m.terms.some(t => new RegExp('\\b' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(lower)))
+    .map(m => m.label);
+}
+
+function highlightText(text, matchers) {
+  let result = text;
+  const terms = [];
+  matchers.forEach(m => m.terms.forEach(t => terms.push(t)));
+  terms.sort((a, b) => b.length - a.length);
+  terms.forEach(t => {
+    const re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    result = result.replace(re, '<span class="ing-hit">$1</span>');
+  });
+  return result;
 }
 
 function toggleCard(i) {
   expanded.has(i) ? expanded.delete(i) : expanded.add(i);
-  renderResults(window._lastData);
+  renderCards(window._lastProducts, window._lastMatchers);
 }
 
-function googleLink(name, brand) {
-  return 'https://www.google.com/search?q=' + encodeURIComponent((brand ? brand + ' ' : '') + name + ' buy online US');
+function buildLocalLinks(product, allergens, location) {
+  const allergenStr = allergens.join(' free ') + ' free';
+  const query = allergenStr + ' ' + product;
+  const localQuery = location ? query + ' near ' + location : query + ' near me';
+
+  return [
+    {
+      icon: '&#128205;',
+      bg: '#e6f1fb',
+      title: 'Find local stores',
+      desc: location ? `Search for "${query}" near ${location}` : 'Search for stores near you',
+      url: 'https://www.google.com/maps/search/' + encodeURIComponent(localQuery),
+    },
+    {
+      icon: '&#128722;',
+      bg: '#eaf3de',
+      title: 'Shop online',
+      desc: `Search US retailers for "${query}"`,
+      url: 'https://www.google.com/search?q=' + encodeURIComponent(query + ' buy online site:walmart.com OR site:amazon.com OR site:thrivemarket.com OR site:target.com'),
+    },
+    {
+      icon: '&#128247;',
+      bg: '#faeeda',
+      title: 'Search all results',
+      desc: `Open Google for "${query}"`,
+      url: 'https://www.google.com/search?q=' + encodeURIComponent(query),
+    },
+  ];
 }
 
-function mapsLink(name, location) {
-  const q = location ? name + ' near ' + location : name + ' near me';
-  return 'https://www.google.com/maps/search/' + encodeURIComponent(q);
-}
+function renderCards(products, matchers) {
+  window._lastProducts = products;
+  window._lastMatchers = matchers;
 
-function renderResults(data) {
-  window._lastData = data;
+  const product = document.getElementById('productInput').value.trim();
+  const location = document.getElementById('locationInput').value.trim();
+  const allergenLabels = matchers.map(m => m.label);
   const area = document.getElementById('resultsArea');
-  if (!data) { area.innerHTML = ''; return; }
 
-  let html = '';
+  if (!products || !products.length) {
+    area.innerHTML = '<div class="empty">No results found.<br>Try a broader search term like "bread" or "crackers".</div>';
+    return;
+  }
 
-  if (data.packaged && data.packaged.length) {
-    html += `<div class="results-heading">&#128230; Packaged products</div>`;
-    data.packaged.forEach((p, i) => {
-      const isOpen = expanded.has(i);
-      const badge = p.caution
-        ? `<span class="badge badge-verify">Verify</span>`
-        : `<span class="badge badge-safe">Safe</span>`;
-      html += `<div class="card">
-        <div class="card-header" onclick="toggleCard(${i})">
-          ${badge}
-          <div class="card-info">
-            <div class="card-name">${p.name}</div>
-            ${p.brand ? `<div class="card-brand">${p.brand}</div>` : ''}
-          </div>
-          <span class="chevron ${isOpen ? 'open' : ''}">&#8964;</span>
+  const scored = products.map((p, i) => {
+    const ing = p.ingredients_text || '';
+    const hits = ing ? detectHits(ing, matchers) : [];
+    return { ...p, hits, score: hits.length, hasIng: !!ing, _idx: i };
+  }).sort((a, b) => {
+    if (!a.hasIng && b.hasIng) return 1;
+    if (a.hasIng && !b.hasIng) return -1;
+    return a.score - b.score;
+  });
+
+  let html = `<div class="results-heading">&#128230; Packaged products (${scored.length})</div>`;
+
+  scored.forEach((p, i) => {
+    const isOpen = expanded.has(i);
+    const name = p.product_name || 'Unknown product';
+    const brand = p.brands || '';
+    const url = p.url || ('https://world.openfoodfacts.org/product/' + p.code);
+    const lastMod = p.last_modified_t
+      ? new Date(p.last_modified_t * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+      : null;
+
+    let pillClass, pillLabel;
+    if (!p.hasIng)       { pillClass = 'pill-unk';   pillLabel = 'No data'; }
+    else if (p.score === 0) { pillClass = 'pill-clear'; pillLabel = 'Clear'; }
+    else if (p.score <= 2)  { pillClass = 'pill-warn';  pillLabel = p.score + ' hit' + (p.score > 1 ? 's' : ''); }
+    else                 { pillClass = 'pill-bad';   pillLabel = p.score + ' hits'; }
+
+    const highlighted = p.ingredients_text ? highlightText(p.ingredients_text, matchers) : '';
+
+    html += `<div class="card">
+      <div class="card-header" onclick="toggleCard(${i})">
+        <span class="score-pill ${pillClass}">${pillLabel}</span>
+        <div class="card-info">
+          <div class="card-name" title="${name.replace(/"/g, '&quot;')}">${name}</div>
+          ${brand ? `<div class="card-brand">${brand}</div>` : ''}
+          ${p.hits.length ? `<div class="card-hits">${p.hits.map(h => `<span class="hit-flag">${h}</span>`).join('')}</div>` : ''}
         </div>
-        ${isOpen ? `<div class="card-body">
-          <div class="ing-label">Ingredients</div>
-          <div class="ing-text">${p.ingredients || 'Not available. Always check the physical package before consuming.'}</div>
-          ${p.caution ? `<div class="caution-note">&#9888; ${p.caution}</div>` : ''}
-          <a class="find-link" href="${googleLink(p.name, p.brand)}" target="_blank" rel="noopener">
-            &#128269; Find this product
-          </a>
-        </div>` : ''}
-      </div>`;
-    });
-  }
-
-  if (data.local && data.local.length) {
-    html += `<div class="results-heading">&#128205; Local options near ${data.location}</div>`;
-    data.local.forEach(l => {
-      html += `<div class="local-card">
-        <div class="local-name">${l.name}</div>
-        <div class="local-desc">${l.description}</div>
-        ${l.caution ? `<div class="caution-note" style="margin-top:8px">&#9888; ${l.caution}</div>` : ''}
-        <a class="find-link" href="${mapsLink(l.name, data.location)}" target="_blank" rel="noopener" style="margin-top:10px">
-          &#128205; Find on Google Maps
+        <span class="chevron ${isOpen ? 'open' : ''}">&#8964;</span>
+      </div>
+      ${isOpen ? `<div class="card-body">
+        <div class="ing-label">Ingredients</div>
+        <div class="ing-text">${highlighted || '<em style="color:var(--text-muted)">No ingredient data in database for this product.</em>'}</div>
+        ${lastMod ? `<div class="updated-note">Last updated in database: ${lastMod}</div>` : ''}
+        <a class="find-link" href="${url}" target="_blank" rel="noopener">
+          &#128269; View on Open Food Facts
         </a>
-      </div>`;
-    });
-  }
+      </div>` : ''}
+    </div>`;
+  });
 
-  if (!data.packaged?.length && !data.local?.length) {
-    html = `<div style="text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:14px">No results found. Try broadening your search or adjusting your allergen filters.</div>`;
-  }
+  const localLinks = buildLocalLinks(product, allergenLabels, location);
+  html += `<div class="results-heading local-section">&#128205; Find it locally or online</div>`;
+  localLinks.forEach(l => {
+    html += `<a class="local-link-card" href="${l.url}" target="_blank" rel="noopener">
+      <div class="local-icon" style="background:${l.bg}">${l.icon}</div>
+      <div class="local-text">
+        <div class="local-title">${l.title}</div>
+        <div class="local-desc">${l.desc}</div>
+      </div>
+      <span class="local-arrow">&#8250;</span>
+    </a>`;
+  });
 
-  html += `<div class="disclaimer">Ingredient information is AI-generated based on known formulations and may not reflect recent changes. Always read the physical package label before consuming, especially for serious allergies. Formulas change without notice.</div>`;
+  html += `<div class="disclaimer">
+    <strong>Always check the physical package.</strong> Ingredient data comes from Open Food Facts, a community-maintained database. The last-updated date is shown where available. Manufacturers change formulas without notice. Never rely solely on this app for allergy decisions.
+  </div>`;
 
   area.innerHTML = html;
 }
 
 async function doSearch() {
   const product = document.getElementById('productInput').value.trim();
-  const location = document.getElementById('locationInput').value.trim();
-  const allergens = getAllergens();
+  const allergens = getAllMatchers();
 
   if (!product) { document.getElementById('status').textContent = 'Enter a food product to search for.'; return; }
   if (!allergens.length) { document.getElementById('status').textContent = 'Select at least one ingredient to avoid.'; return; }
@@ -627,36 +712,37 @@ async function doSearch() {
   const btn = document.getElementById('searchBtn');
   const status = document.getElementById('status');
   btn.disabled = true;
-  document.getElementById('btnIcon').outerHTML = '<span class="spinner" id="btnIcon"></span>';
-  document.getElementById('btnText').textContent = 'Searching...';
-  status.textContent = 'Finding safe products...';
+  document.getElementById('btnContent').innerHTML = '<span class="spinner"></span> Searching...';
+  status.textContent = 'Fetching from Open Food Facts...';
   document.getElementById('resultsArea').innerHTML = '';
   expanded.clear();
 
   try {
-    const resp = await fetch('/api/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product, allergens, location }),
-    });
-
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error || `Server error ${resp.status}`);
-    }
-
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(product)}&search_simple=1&action=process&json=1&page_size=40&fields=product_name,brands,ingredients_text,url,code,last_modified_t&lc=en&cc=us`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`Open Food Facts returned ${resp.status}`);
     const data = await resp.json();
-    status.textContent = `Found ${data.packaged?.length || 0} packaged products${data.local?.length ? ' and ' + data.local.length + ' local options' : ''}.`;
-    renderResults(data);
+    const products = (data.products || []).filter(p => p.product_name && p.product_name.trim());
+
+    if (!products.length) {
+      status.textContent = `No products found for "${product}".`;
+      document.getElementById('resultsArea').innerHTML = '<div class="empty">No results found.<br>Try a broader search term like "bread" or "crackers".</div>';
+    } else {
+      const clearCount = products.filter(p => {
+        const ing = p.ingredients_text || '';
+        return ing && detectHits(ing, allergens).length === 0;
+      }).length;
+      status.textContent = `${products.length} products found. ${clearCount} appear clear of your allergens.`;
+      renderCards(products, allergens);
+    }
 
   } catch (e) {
     status.textContent = '';
-    document.getElementById('resultsArea').innerHTML = `<div class="error-box">Search failed: ${e.message}. Please try again.</div>`;
+    document.getElementById('resultsArea').innerHTML = `<div class="error-box">Could not reach Open Food Facts: ${e.message}. Check your connection and try again.</div>`;
   }
 
   btn.disabled = false;
-  document.querySelector('.spinner')?.remove();
-  btn.innerHTML = '<span id="btnIcon">&#128269;</span> <span id="btnText">Find safe products</span>';
+  document.getElementById('btnContent').innerHTML = '&#128269; Find safe products';
 }
 
 document.getElementById('productInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });

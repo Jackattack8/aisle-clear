@@ -1,81 +1,66 @@
 # AisleClear
 
-Find packaged foods and local stores that match your allergen restrictions. Built for parents and caregivers who need to quickly identify safe products while shopping.
+Find packaged foods that match your allergen restrictions, using real ingredient data. Built for parents and caregivers who need fast, reliable answers in the grocery store aisle.
 
 ## What it does
 
 - Set allergen restrictions with large tap-friendly buttons (gluten, dairy, eggs, banana, soy, peanuts, tree nuts, sesame, or any custom ingredient)
 - Search any food category (bread, crackers, pasta, etc.)
-- Optionally enter your city or zip code for local store results
-- Returns named packaged products with full ingredient lists and Google search links
-- Flags products where a banned ingredient may be hiding as a substitute (e.g. banana used as egg replacer in gluten-free baking)
-- Local bakeries and specialty stores surfaced with Google Maps links
+- Results come from Open Food Facts, a real ingredient database, not AI recall
+- Allergen terms highlighted in red directly in the ingredient list
+- Last-updated date shown so you know how fresh the data is
+- Local store and online shopping search links built from your allergen list and location
 - Mobile-first design built for use in the grocery store aisle
+- Zero API keys required, zero token cost, free to host and share publicly
+
+## Important disclaimer
+
+Ingredient data comes from Open Food Facts, a community-maintained database. Always verify ingredients on the physical package before consuming, especially for serious allergies. Manufacturers change formulas without notice.
 
 ## Tech stack
 
-- Vanilla HTML/CSS/JS frontend (no framework, fast load on mobile)
-- Vercel serverless function routes requests to the Claude API
-- Claude claude-sonnet-4-6 powers the allergen-aware product search and reasoning
+- Vanilla HTML, CSS, and JS (no framework, fast on mobile)
+- Open Food Facts public API for real ingredient data
+- Client-side allergen string matching with synonym expansion
+- Static site, no backend or serverless functions needed
 
-## Setup
+## Deployment
 
-### 1. Clone and install
+### Deploy to Vercel (recommended)
 
-```bash
-git clone https://github.com/YOUR_USERNAME/aisle-clear.git
-cd aisle-clear
-npm install -g vercel
-```
+1. Push this repo to GitHub
+2. Go to vercel.com and import the repo
+3. Vercel auto-detects the static site, no config needed
+4. Deploy. Done.
 
-### 2. Get your Anthropic API key
+No environment variables required.
 
-Sign up at https://console.anthropic.com and create an API key.
+### Deploy to GitHub Pages
 
-### 3. Deploy to Vercel
+1. Push to GitHub
+2. Go to repo Settings > Pages
+3. Set source to the `public` folder
+4. Done.
 
-```bash
-vercel
-```
+### Local development
 
-When prompted, add your environment variable:
-
-```
-ANTHROPIC_API_KEY=your_key_here
-```
-
-Or add it in the Vercel dashboard under Settings > Environment Variables.
-
-### 4. Local development
+Open `public/index.html` directly in your browser, or use any static file server:
 
 ```bash
-vercel dev
+npx serve public
 ```
-
-Then open http://localhost:3000
 
 ## Project structure
 
 ```
 aisle-clear/
-  api/
-    search.js       Vercel serverless function, calls Claude API
   public/
-    index.html      Full frontend, mobile-first
-  vercel.json       Vercel routing config
+    index.html    Full app, single file
+  vercel.json     Vercel static site config
   package.json
   README.md
+  .gitignore
 ```
-
-## Environment variables
-
-| Variable | Description |
-|---|---|
-| ANTHROPIC_API_KEY | Your Anthropic API key from console.anthropic.com |
-
-## Disclaimer
-
-Ingredient information is AI-generated based on known product formulations and may not reflect recent changes. Always read the physical package label before consuming, especially for serious allergies.
 
 ## Built by
 
